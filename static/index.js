@@ -3,6 +3,8 @@ const start = document.getElementById('startBtn');
 const stop = document.getElementById('stopBtn');
 const language = document.getElementById('language');
 const container = document.getElementById('translationContainer');
+const speech = document.getElementById('speech');
+const text = document.getElementById('text');
 
 const languageCodes = [
   "afr", "amh", "arb", "ary", "arz", "asm", "ast", "azj", "bel", "ben",
@@ -18,8 +20,12 @@ const languageCodes = [
   "yue", "zlm", "zsm", "zul"
 ];
 
+const availSpeech = ['arb', 'ben', 'cat', 'ces', 'cmn', 'cmn_hant', 'cym', 'dan', 'deu', 'eng', 'est', 'fin', 'fra', 'hin', 'ind', 'ita', 'jpn', 'kor', 'mlt',
+  'nld', 'pes', 'pol', 'por', 'ron', 'rus', 'slk', 'spa', 'swe', 'swh', 'tel', 'tgl', 'tha', 'tur', 'ukr', 'urd', 'uzn', 'vie'];
+
+
 socket.on('connect', () => {
-  console.log('Connected to backend')
+  console.log('Connected to backend');
 });
 
 socket.on('disconnect', (reason) => {
@@ -30,14 +36,21 @@ socket.on('translated', (data) => {
   const floatArray = new Float32Array(data);
   const wavBlob = float32ToWav16bit(floatArray);
   const url = URL.createObjectURL(wavBlob);
-  create_translated_div(url);
+  createTranslatedDiv(url);
 });
+
 
 let mediaRecorder;
 let chunks = [];
 
 // Start recording the audio
 start.addEventListener('click', (event) => {
+  if (!speech.checked && !text.checked) {
+    addError('outputError', 'Please select at least one output mode.');
+    return;
+  } else {
+    removeError('outputError');
+  }
   event.preventDefault();
   navigator.mediaDevices.getUserMedia({ audio: true })
     .then((stream) => {
@@ -78,7 +91,20 @@ stop.addEventListener('click', (event) => {
   }
 });
 
-function create_translated_div(url) {
+
+language.addEventListener('change', () => {
+  speech.disabled = false; const label = document.querySelector(`label[for="${speech.id}"]`);
+  label.style.color = 'black';
+  removeError('speechErr');
+  const code = language.value;
+  if (!availSpeech.includes(code)) {
+    label.style.color = 'grey';
+    speech.disabled = true;
+    addError('speechErr', 'We apologize for the inconvenience. We are actively working to make speech output available in this language.')
+  }
+});
+
+function createTranslatedDiv(url) {
   const audio = document.createElement('audio');
   audio.classList.add('translatedAudio');
   audio.src = url;
@@ -131,5 +157,24 @@ function float32ToWav16bit(float32Array) {
     for (let i = 0; i < str.length; i++) {
       view.setUint8(offset + i, str.charCodeAt(i));
     }
+  }
+}
+
+function addError(id, message) {
+  const error = document.getElementById(id);
+  if (error) {
+    error.remove();
+  }
+  const p = document.createElement('p');
+  p.id = id;
+  p.textContent = message;
+  p.style.maxWidth = '40vw';
+  document.getElementById('outputContainer').appendChild(p);
+}
+
+function removeError(id) {
+  const error = document.getElementById(id);
+  if (error) {
+    error.remove();
   }
 }

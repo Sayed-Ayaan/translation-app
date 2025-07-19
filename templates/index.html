@@ -15,9 +15,9 @@
 <body>
   <div id="bodyContainer">
     <h1>Translator</h1>
-    <div style= "margin-bottom: 10px;">
+    <div style="margin-bottom: 10px; width: 100%;">
       <label for="language" style="margin-right: 5px;">Output language: </label>
-      <select name="language" id="language">
+      <select name="language" id="language" >
         <option value="afr">Afrikaans</option>
         <option value="amh">Amharic</option>
         <option value="arb">Modern Standard Arabic</option>
@@ -39,7 +39,7 @@
         <option value="dan">Danish</option>
         <option value="deu">German</option>
         <option value="ell">Greek</option>
-        <option value="eng">English</option>
+        <option value="eng" selected>English</option>
         <option value="est">Estonian</option>
         <option value="eus">Basque</option>
         <option value="fin">Finnish</option>
@@ -117,10 +117,10 @@
         <option value="zul">Zulu</option>
       </select>
     </div>
-    <div>
+    <div id="outputContainer">
       <input type="checkbox" id="text" name="text" value="text">
       <label for="text">Text Output</label>
-      <input type="checkbox" id="speech" name="speech" value="speech">
+      <input type="checkbox" id="speech" name="speech" value="speech" style="margin-left: 1vw;">
       <label for="speech">Speech Output</label>
     </div>
     <div>
