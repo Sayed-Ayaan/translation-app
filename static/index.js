@@ -3,7 +3,6 @@ const start = document.getElementById('startBtn');
 const stop = document.getElementById('stopBtn');
 const language = document.getElementById('language');
 const container = document.getElementById('translationContainer');
-// socket.binaryType = "arraybuffer";
 
 const languageCodes = [
   "afr", "amh", "arb", "ary", "arz", "asm", "ast", "azj", "bel", "ben",
