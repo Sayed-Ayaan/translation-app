@@ -33,10 +33,15 @@ socket.on('disconnect', (reason) => {
 });
 
 socket.on('translated', (data) => {
-  const floatArray = new Float32Array(data);
-  const wavBlob = float32ToWav16bit(floatArray);
-  const url = URL.createObjectURL(wavBlob);
-  createTranslatedDiv(url);
+  if (data instanceof ArrayBuffer){
+    const floatArray = new Float32Array(data);
+    const wavBlob = float32ToWav16bit(floatArray);
+    const url = URL.createObjectURL(wavBlob);
+    createAudiodDiv(url);
+  } else {
+    createTextDiv(data);
+  }
+
 });
 
 
@@ -69,7 +74,7 @@ start.addEventListener('click', (event) => {
         } else if (blob.size >= 2 * 1024 * 1024) {
           alert('Do not exceed 2MB');
         } else {
-          socket.emit('audio', { audio: blob, code: language.value });
+          socket.emit('audio', { audio: blob, code: language.value, speech:speech.checked, text: text.checked});
         }
       };
       mediaRecorder.start();
@@ -98,13 +103,14 @@ language.addEventListener('change', () => {
   removeError('speechErr');
   const code = language.value;
   if (!availSpeech.includes(code)) {
+    speech.checked = false;
     label.style.color = 'grey';
     speech.disabled = true;
     addError('speechErr', 'We apologize for the inconvenience. We are actively working to make speech output available in this language.')
   }
 });
 
-function createTranslatedDiv(url) {
+function createAudiodDiv(url) {
   const audio = document.createElement('audio');
   audio.classList.add('translatedAudio');
   audio.src = url;
@@ -112,6 +118,14 @@ function createTranslatedDiv(url) {
   audio.autoplay = true;
   container.appendChild(audio);
 }
+
+function createTextDiv(data) {
+  const p = document.createElement('p');
+  p.classList.add('translatedText');
+  p.textContent = data;
+  container.appendChild(p);
+}
+
 
 function float32ToWav16bit(float32Array) {
   const sampleRate = 16000;
@@ -161,10 +175,7 @@ function float32ToWav16bit(float32Array) {
 }
 
 function addError(id, message) {
-  const error = document.getElementById(id);
-  if (error) {
-    error.remove();
-  }
+  removeError(id);
   const p = document.createElement('p');
   p.id = id;
   p.textContent = message;
